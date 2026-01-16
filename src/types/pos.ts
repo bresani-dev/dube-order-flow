@@ -29,6 +29,24 @@ export interface Order {
   kitchenTicketTime?: Date;
 }
 
+export interface CompletedOrder {
+  id: string;
+  tableNumber: number;
+  items: OrderItem[];
+  total: number;
+  paymentMethod: PaymentMethod;
+  completedAt: Date;
+}
+
+export interface DailySummary {
+  date: string;
+  orders: CompletedOrder[];
+  totalCash: number;
+  totalCard: number;
+  totalPix: number;
+  grandTotal: number;
+}
+
 export interface KitchenTicket {
   orderId: string;
   tableNumber: number;

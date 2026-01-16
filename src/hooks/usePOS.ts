@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Table, Order, OrderItem, MenuItem, PaymentMethod } from '@/types/pos';
+import { Table, Order, OrderItem, MenuItem, PaymentMethod, CompletedOrder } from '@/types/pos';
 
 const STORAGE_KEY = 'dube-burger-pos';
+const ORDERS_KEY = 'dube-burger-orders';
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
@@ -23,15 +24,29 @@ const createDefaultTables = (): Table[] => {
   }));
 };
 
+const getCompletedOrders = (): CompletedOrder[] => {
+  const saved = localStorage.getItem(ORDERS_KEY);
+  if (saved) {
+    return JSON.parse(saved);
+  }
+  return [];
+};
+
 export const usePOS = () => {
   const [tables, setTables] = useState<Table[]>(getInitialTables);
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [currentOrder, setCurrentOrder] = useState<OrderItem[]>([]);
+  const [completedOrders, setCompletedOrders] = useState<CompletedOrder[]>(getCompletedOrders);
 
-  // Persist to localStorage
+  // Persist tables to localStorage
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ tables }));
   }, [tables]);
+
+  // Persist completed orders to localStorage
+  useEffect(() => {
+    localStorage.setItem(ORDERS_KEY, JSON.stringify(completedOrders));
+  }, [completedOrders]);
 
   // Load order when selecting a table
   useEffect(() => {
@@ -139,6 +154,23 @@ export const usePOS = () => {
   const finalizeTable = useCallback((paymentMethod: PaymentMethod) => {
     if (!selectedTable) return;
 
+    const total = currentOrder.reduce(
+      (sum, item) => sum + item.menuItem.price * item.quantity,
+      0
+    );
+
+    // Add to completed orders
+    const completedOrder: CompletedOrder = {
+      id: generateId(),
+      tableNumber: selectedTable.number,
+      items: currentOrder,
+      total,
+      paymentMethod,
+      completedAt: new Date(),
+    };
+
+    setCompletedOrders(prev => [...prev, completedOrder]);
+
     setTables(prev =>
       prev.map(t =>
         t.id === selectedTable.id
@@ -149,7 +181,7 @@ export const usePOS = () => {
 
     setSelectedTable(null);
     setCurrentOrder([]);
-  }, [selectedTable]);
+  }, [selectedTable, currentOrder]);
 
   const getOrderTotal = useCallback(() => {
     return currentOrder.reduce(
@@ -158,10 +190,50 @@ export const usePOS = () => {
     );
   }, [currentOrder]);
 
+  const getTodayOrders = useCallback(() => {
+    const today = new Date().toDateString();
+    return completedOrders.filter(
+      order => new Date(order.completedAt).toDateString() === today
+    );
+  }, [completedOrders]);
+
+  const getDailySummary = useCallback(() => {
+    const todayOrders = getTodayOrders();
+    
+    const totalCash = todayOrders
+      .filter(o => o.paymentMethod === 'cash')
+      .reduce((sum, o) => sum + o.total, 0);
+    
+    const totalCard = todayOrders
+      .filter(o => o.paymentMethod === 'card')
+      .reduce((sum, o) => sum + o.total, 0);
+    
+    const totalPix = todayOrders
+      .filter(o => o.paymentMethod === 'pix')
+      .reduce((sum, o) => sum + o.total, 0);
+
+    return {
+      date: new Date().toLocaleDateString('pt-BR'),
+      orders: todayOrders,
+      totalCash,
+      totalCard,
+      totalPix,
+      grandTotal: totalCash + totalCard + totalPix,
+    };
+  }, [getTodayOrders]);
+
+  const clearTodayOrders = useCallback(() => {
+    const today = new Date().toDateString();
+    setCompletedOrders(prev => 
+      prev.filter(order => new Date(order.completedAt).toDateString() !== today)
+    );
+  }, []);
+
   return {
     tables,
     selectedTable,
     currentOrder,
+    completedOrders,
     addTable,
     selectTable,
     closeTable,
@@ -170,5 +242,8 @@ export const usePOS = () => {
     sendToKitchen,
     finalizeTable,
     getOrderTotal,
+    getTodayOrders,
+    getDailySummary,
+    clearTodayOrders,
   };
 };
