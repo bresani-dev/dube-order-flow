@@ -2,12 +2,10 @@ import { MenuItem } from '@/types/pos';
 
 export const menuItems: MenuItem[] = [
   // Burgers
-  { id: 'burger-1', name: 'Classic Burger', price: 24.90, category: 'burgers' },
-  { id: 'burger-2', name: 'Cheese Burger', price: 27.90, category: 'burgers' },
-  { id: 'burger-3', name: 'Bacon Burger', price: 32.90, category: 'burgers' },
-  { id: 'burger-4', name: 'Double Dube', price: 39.90, category: 'burgers' },
-  { id: 'burger-5', name: 'Veggie Burger', price: 26.90, category: 'burgers' },
-  { id: 'burger-6', name: 'Chicken Burger', price: 28.90, category: 'burgers' },
+  { id: 'burger-1', name: 'Dube Cheese', price: 24.90, category: 'burgers' },
+  { id: 'burger-2', name: 'Dube Bacon', price: 27.90, category: 'burgers' },
+  { id: 'burger-3', name: 'Dube Melt', price: 32.90, category: 'burgers' },
+  { id: 'burger-4', name: 'Dube Burger', price: 39.90, category: 'burgers' },
 
   // Drinks
   { id: 'drink-1', name: 'Coca-Cola', price: 6.00, category: 'drinks' },
