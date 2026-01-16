@@ -23,4 +23,17 @@ export const menuItems: MenuItem[] = [
   { id: 'side-3', name: 'Fritas 400', price: 30.00, category: 'sides' },
   { id: 'side-4', name: 'Fritas 400 C/B', price: 40.00, category: 'sides' },
   { id: 'side-5', name: 'Nuggets (10un)', price: 20.00, category: 'sides' },
+
+
+  //Podrao
+  { id: 'podrao-1', name: 'X-Burger', price: 22.00, category: 'podrao' },
+  { id: 'podrao-2', name: 'X-Bacon', price: 26.00, category: 'podrao' },
+  { id: 'podrao-3', name: 'X-EggBacon', price: 28.00, category: 'podrao' },
+  { id: 'podrao-4', name: 'X-EggBurger', price: 25.00, category: 'podrao' },
+  { id: 'podrao-5', name: 'X-Tudo', price: 30.00, category: 'podrao' },
+  { id: 'podrao-6', name: 'X-Dube', price: 35.00, category: 'podrao' },
+
+  //Macarrao
+  { id: 'macarrao-1', name: 'Dube na Chapa', price: 30.00, category: 'macarrao' },
+  { id: 'macarrao-2', name: 'Gratinar', price: 2.00, category: 'macarrao' },
 ];
