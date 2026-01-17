@@ -8,7 +8,7 @@ import { PaymentModal } from './PaymentModal';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Printer, CreditCard, UtensilsCrossed } from 'lucide-react';
 
-type Category = 'burgers' | 'drinks' | 'sides';
+type Category = 'artesanal' | 'podrao' | 'macarrao' | 'drinks' | 'sides';
 
 interface OrderScreenProps {
   table: Table;
@@ -22,13 +22,17 @@ interface OrderScreenProps {
 }
 
 const categoryLabels: Record<Category, string> = {
-  burgers: 'Burgers',
+  artesanal: 'Artesanal',
+  podrao: 'Podrão',
+  macarrao: 'Macarrão',
   drinks: 'Bebidas',
   sides: 'Acompanhamentos',
 };
 
 const categoryIcons: Record<Category, string> = {
-  burgers: '🍔',
+  artesanal: '🍔',
+  podrao: '🌭',
+  macarrao: '🍝',
   drinks: '🥤',
   sides: '🍟',
 };
@@ -43,7 +47,7 @@ export const OrderScreen = ({
   onSendToKitchen,
   onFinalize,
 }: OrderScreenProps) => {
-  const [activeCategory, setActiveCategory] = useState<Category>('burgers');
+  const [activeCategory, setActiveCategory] = useState<Category>('artesanal');
   const [kitchenTicket, setKitchenTicket] = useState<KitchenTicketType | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const ticketRef = useRef<HTMLDivElement>(null);

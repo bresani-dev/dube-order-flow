@@ -11,7 +11,7 @@ export interface MenuItem {
   id: string;
   name: string;
   price: number;
-  category: 'burgers' | 'drinks' | 'sides' | 'podrao' | 'macarrao';
+  category: 'artesanal' | 'podrao' | 'macarrao' | 'drinks' | 'sides';
 }
 
 export interface OrderItem {
