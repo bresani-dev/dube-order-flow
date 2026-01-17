@@ -134,11 +134,35 @@ export const usePOS = () => {
   const sendToKitchen = useCallback(() => {
     if (!selectedTable || currentOrder.length === 0) return null;
 
+    // Get previously sent items
+    const previouslySentItems = selectedTable.order?.sentItems || [];
+    
+    // Calculate new items (items in current order that weren't in sent items or have increased quantity)
+    const newItems: OrderItem[] = [];
+    
+    currentOrder.forEach(currentItem => {
+      const previousItem = previouslySentItems.find(
+        sent => sent.menuItem.id === currentItem.menuItem.id
+      );
+      
+      if (!previousItem) {
+        // Completely new item
+        newItems.push(currentItem);
+      } else if (currentItem.quantity > previousItem.quantity) {
+        // Item with increased quantity - only add the difference
+        newItems.push({
+          ...currentItem,
+          quantity: currentItem.quantity - previousItem.quantity,
+        });
+      }
+    });
+
     const order: Order = {
-      id: generateId(),
+      id: selectedTable.order?.id || generateId(),
       tableId: selectedTable.id,
       items: currentOrder,
-      createdAt: new Date(),
+      sentItems: currentOrder.map(item => ({ ...item })), // Deep copy current as sent
+      createdAt: selectedTable.order?.createdAt || new Date(),
       sentToKitchen: true,
       kitchenTicketTime: new Date(),
     };
@@ -153,10 +177,12 @@ export const usePOS = () => {
 
     setSelectedTable(prev => prev ? { ...prev, status: 'waiting', order } : null);
 
+    // Return only the new items for printing
     return {
       orderId: order.id,
       tableNumber: selectedTable.number,
-      items: currentOrder,
+      tableName: selectedTable.name,
+      items: newItems.length > 0 ? newItems : currentOrder, // If no previous items, send all
       createdAt: new Date(),
     };
   }, [selectedTable, currentOrder]);
