@@ -7,9 +7,10 @@ interface TableGridProps {
   tables: Table[];
   onSelectTable: (table: Table) => void;
   onAddTable: () => void;
+  onUpdateTableName: (tableId: string, name: string) => void;
 }
 
-export const TableGrid = ({ tables, onSelectTable, onAddTable }: TableGridProps) => {
+export const TableGrid = ({ tables, onSelectTable, onAddTable, onUpdateTableName }: TableGridProps) => {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-8">
@@ -33,6 +34,7 @@ export const TableGrid = ({ tables, onSelectTable, onAddTable }: TableGridProps)
             key={table.id}
             table={table}
             onClick={() => onSelectTable(table)}
+            onUpdateName={onUpdateTableName}
           />
         ))}
       </div>

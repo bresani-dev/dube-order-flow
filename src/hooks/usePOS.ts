@@ -68,6 +68,16 @@ export const usePOS = () => {
     setTables(prev => [...prev, newTable]);
   }, [tables]);
 
+  const updateTableName = useCallback((tableId: string, name: string) => {
+    setTables(prev =>
+      prev.map(t =>
+        t.id === tableId
+          ? { ...t, name: name || undefined }
+          : t
+      )
+    );
+  }, []);
+
   const selectTable = useCallback((table: Table) => {
     setSelectedTable(table);
     if (table.order) {
@@ -235,6 +245,7 @@ export const usePOS = () => {
     currentOrder,
     completedOrders,
     addTable,
+    updateTableName,
     selectTable,
     closeTable,
     addItemToOrder,

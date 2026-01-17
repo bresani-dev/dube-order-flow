@@ -267,7 +267,7 @@ export const OrderScreen = ({
             Voltar
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Mesa {table.number}</h1>
+            <h1 className="text-2xl font-bold">{table.name || `Mesa ${table.number}`}</h1>
             <p className="text-muted-foreground">
               {table.status === 'waiting' ? 'Aguardando pagamento' : 'Fazendo pedido'}
             </p>
