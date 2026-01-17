@@ -3,6 +3,7 @@ export type TableStatus = 'free' | 'ordering' | 'waiting';
 export interface Table {
   id: string;
   number: number;
+  name?: string;
   status: TableStatus;
   order: Order | null;
 }

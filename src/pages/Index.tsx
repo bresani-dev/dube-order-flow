@@ -17,6 +17,7 @@ const Index = () => {
     selectedTable,
     currentOrder,
     addTable,
+    updateTableName,
     selectTable,
     closeTable,
     addItemToOrder,
@@ -87,6 +88,7 @@ const Index = () => {
           tables={tables}
           onSelectTable={selectTable}
           onAddTable={addTable}
+          onUpdateTableName={updateTableName}
         />
       ) : (
         <CashierReport
