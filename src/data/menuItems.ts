@@ -29,6 +29,6 @@ export const menuItems: MenuItem[] = [
   { id: 'side-3', name: 'Fritas 400', price: 30.00, category: 'sides' },
   { id: 'side-4', name: 'Fritas 400 C/B', price: 40.00, category: 'sides' },
   { id: 'side-5', name: 'Nuggets (10un)', price: 20.00, category: 'sides' },
-  { id: 'sides-6', name: 'Dube na Chapa', price: 30.00, category: 'sider' },
+  { id: 'sides-6', name: 'Dube na Chapa', price: 30.00, category: 'sides' },
   { id: 'sides-7', name: 'Gratinar', price: 2.00, category: 'sides' },
 ];
