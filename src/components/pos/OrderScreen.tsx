@@ -58,7 +58,152 @@ export const OrderScreen = ({
   };
 
   const handlePrint = () => {
-    window.print();
+    if (!kitchenTicket) return;
+    
+    const printWindow = window.open('', '_blank', 'width=300,height=600');
+    if (printWindow) {
+      const formatDate = (date: Date) => {
+        return new Date(date).toLocaleString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      };
+
+      const itemsHtml = kitchenTicket.items.map(item => `
+        <div style="display: flex; justify-content: space-between; margin: 8px 0; font-weight: 700;">
+          <span><strong style="font-weight: 900;">${item.quantity}x</strong> ${item.menuItem.name}</span>
+        </div>
+      `).join('');
+
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Comanda</title>
+          <style>
+            @page {
+              size: 80mm auto;
+              margin: 0;
+            }
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+            body {
+              font-family: 'Courier New', 'Lucida Console', monospace;
+              font-size: 14px;
+              line-height: 1.5;
+              padding: 8px;
+              width: 80mm;
+              color: #000 !important;
+              background: #fff !important;
+              font-weight: 700;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .header {
+              text-align: center;
+              border-bottom: 2px dashed #000;
+              padding-bottom: 12px;
+              margin-bottom: 12px;
+            }
+            .title {
+              font-size: 22px;
+              font-weight: 900;
+              letter-spacing: 1px;
+            }
+            .subtitle {
+              font-size: 13px;
+              margin-top: 4px;
+            }
+            .info {
+              border-bottom: 2px dashed #000;
+              padding-bottom: 12px;
+              margin-bottom: 12px;
+            }
+            .info-row {
+              display: flex;
+              justify-content: space-between;
+              font-size: 16px;
+              margin: 4px 0;
+            }
+            .mesa {
+              font-size: 20px;
+              font-weight: 900;
+            }
+            .items {
+              margin-bottom: 12px;
+            }
+            .notes {
+              border-top: 2px dashed #000;
+              padding-top: 12px;
+              margin-top: 12px;
+            }
+            .footer {
+              border-top: 2px dashed #000;
+              padding-top: 12px;
+              margin-top: 12px;
+              text-align: center;
+              font-size: 13px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="title">DUBE BURGER</div>
+            <div class="subtitle">Comanda de Cozinha</div>
+          </div>
+          
+          <div class="info">
+            <div class="info-row">
+              <span style="font-weight: 700;">Mesa:</span>
+              <span class="mesa">${kitchenTicket.tableNumber}</span>
+            </div>
+            <div class="info-row" style="font-size: 13px;">
+              <span>Pedido:</span>
+              <span>#${kitchenTicket.orderId.slice(-6).toUpperCase()}</span>
+            </div>
+          </div>
+          
+          <div class="items">
+            ${itemsHtml}
+          </div>
+          
+          ${kitchenTicket.notes ? `
+            <div class="notes">
+              <div style="font-weight: 900;">Observações:</div>
+              <div style="margin-top: 4px;">${kitchenTicket.notes}</div>
+            </div>
+          ` : ''}
+          
+          <div class="footer">
+            ${formatDate(kitchenTicket.createdAt)}
+          </div>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+      
+      // Auto-print after a short delay
+      setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+        // Close after printing
+        printWindow.onafterprint = () => {
+          printWindow.close();
+        };
+        // Fallback close for browsers that don't support onafterprint
+        setTimeout(() => {
+          if (!printWindow.closed) {
+            printWindow.close();
+          }
+        }, 1000);
+      }, 200);
+    }
   };
 
   const handleCloseTicket = () => {
