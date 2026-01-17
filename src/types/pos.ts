@@ -25,6 +25,7 @@ export interface Order {
   id: string;
   tableId: string;
   items: OrderItem[];
+  sentItems: OrderItem[]; // Items already sent to kitchen
   createdAt: Date;
   sentToKitchen: boolean;
   kitchenTicketTime?: Date;
@@ -51,6 +52,7 @@ export interface DailySummary {
 export interface KitchenTicket {
   orderId: string;
   tableNumber: number;
+  tableName?: string;
   items: OrderItem[];
   createdAt: Date;
   notes?: string;

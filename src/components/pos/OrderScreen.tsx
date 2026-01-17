@@ -4,9 +4,9 @@ import { menuItems } from '@/data/menuItems';
 import { MenuItemCard } from './MenuItemCard';
 import { OrderSummary } from './OrderSummary';
 import { KitchenTicket } from './KitchenTicket';
-import { PaymentModal } from './PaymentModal';
+import { CheckoutSheet } from './CheckoutSheet';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Printer, CreditCard, UtensilsCrossed } from 'lucide-react';
+import { ArrowLeft, Printer, Receipt, UtensilsCrossed } from 'lucide-react';
 
 type Category = 'artesanal' | 'podrao' | 'macarrao' | 'drinks' | 'sides';
 
@@ -49,10 +49,17 @@ export const OrderScreen = ({
 }: OrderScreenProps) => {
   const [activeCategory, setActiveCategory] = useState<Category>('artesanal');
   const [kitchenTicket, setKitchenTicket] = useState<KitchenTicketType | null>(null);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
   const ticketRef = useRef<HTMLDivElement>(null);
 
   const filteredItems = menuItems.filter(item => item.category === activeCategory);
+
+  // Check if there are new items to send
+  const sentItems = table.order?.sentItems || [];
+  const hasNewItems = currentOrder.some(currentItem => {
+    const sentItem = sentItems.find(s => s.menuItem.id === currentItem.menuItem.id);
+    return !sentItem || currentItem.quantity > sentItem.quantity;
+  });
 
   const handleSendToKitchen = () => {
     const ticket = onSendToKitchen();
@@ -75,6 +82,8 @@ export const OrderScreen = ({
           minute: '2-digit',
         });
       };
+
+      const displayName = kitchenTicket.tableName || `Mesa ${kitchenTicket.tableNumber}`;
 
       const itemsHtml = kitchenTicket.items.map(item => `
         <div style="display: flex; justify-content: space-between; margin: 8px 0; font-weight: 700;">
@@ -124,6 +133,14 @@ export const OrderScreen = ({
               font-size: 13px;
               margin-top: 4px;
             }
+            .new-items-badge {
+              background: #000;
+              color: #fff;
+              padding: 4px 8px;
+              font-size: 12px;
+              margin-top: 8px;
+              display: inline-block;
+            }
             .info {
               border-bottom: 2px dashed #000;
               padding-bottom: 12px;
@@ -160,12 +177,13 @@ export const OrderScreen = ({
           <div class="header">
             <div class="title">DUBE BURGER</div>
             <div class="subtitle">Comanda de Cozinha</div>
+            ${table.order?.sentItems && table.order.sentItems.length > 0 ? '<div class="new-items-badge">⚡ ITENS NOVOS</div>' : ''}
           </div>
           
           <div class="info">
             <div class="info-row">
               <span style="font-weight: 700;">Mesa:</span>
-              <span class="mesa">${kitchenTicket.tableNumber}</span>
+              <span class="mesa">${displayName}</span>
             </div>
             <div class="info-row" style="font-size: 13px;">
               <span>Pedido:</span>
@@ -192,15 +210,12 @@ export const OrderScreen = ({
       `);
       printWindow.document.close();
       
-      // Auto-print after a short delay
       setTimeout(() => {
         printWindow.focus();
         printWindow.print();
-        // Close after printing
         printWindow.onafterprint = () => {
           printWindow.close();
         };
-        // Fallback close for browsers that don't support onafterprint
         setTimeout(() => {
           if (!printWindow.closed) {
             printWindow.close();
@@ -216,7 +231,7 @@ export const OrderScreen = ({
 
   const handleFinalize = (method: PaymentMethod) => {
     onFinalize(method);
-    setShowPaymentModal(false);
+    setShowCheckout(false);
   };
 
   const handleAddFromSummary = (menuItemId: string) => {
@@ -310,6 +325,7 @@ export const OrderScreen = ({
         <div className="flex-1 min-h-0">
           <OrderSummary
             items={currentOrder}
+            sentItems={sentItems}
             onAddItem={handleAddFromSummary}
             onRemoveItem={onRemoveItem}
             total={total}
@@ -318,38 +334,40 @@ export const OrderScreen = ({
 
         {currentOrder.length > 0 && (
           <div className="mt-6 space-y-3">
-            {!table.order?.sentToKitchen && (
+            {hasNewItems && (
               <Button
                 onClick={handleSendToKitchen}
                 size="lg"
                 className="w-full touch-button bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <Printer className="w-5 h-5 mr-2" />
-                Enviar para Cozinha
+                {table.order?.sentToKitchen ? 'Enviar Novos Itens' : 'Enviar para Cozinha'}
               </Button>
             )}
 
             {table.status === 'waiting' && (
               <Button
-                onClick={() => setShowPaymentModal(true)}
+                onClick={() => setShowCheckout(true)}
                 size="lg"
                 variant="outline"
                 className="w-full touch-button border-success text-success hover:bg-success/10"
               >
-                <CreditCard className="w-5 h-5 mr-2" />
-                Finalizar e Pagar
+                <Receipt className="w-5 h-5 mr-2" />
+                Fechar Conta
               </Button>
             )}
           </div>
         )}
       </div>
 
-      <PaymentModal
-        isOpen={showPaymentModal}
-        onClose={() => setShowPaymentModal(false)}
+      <CheckoutSheet
+        isOpen={showCheckout}
+        onClose={() => setShowCheckout(false)}
         onConfirm={handleFinalize}
+        items={currentOrder}
         total={total}
         tableNumber={table.number}
+        tableName={table.name}
       />
     </div>
   );
