@@ -28,6 +28,9 @@ export const menuItems: MenuItem[] = [
   { id: 'drink-6', name: 'Suco', price: 7.00, category: 'drinks' },
   { id: 'drink-7', name: 'Água Mineral', price: 4.00, category: 'drinks' },
   { id: 'drink-8', name: 'Heineken', price: 12.00, category: 'drinks' },
+  { id: 'drink-9', name: 'Refri 600ml', price: 9.00, category: 'drinks' },
+  { id: 'drink-10', name: 'Refri 2lt', price: 15.00, category: 'drinks' },
+  { id: 'drink-11', name: 'Refri 1lt', price: 10.00, category: 'drinks' },
 
   // Acompanhamentos
   { id: 'side-1', name: 'Fritas 200', price: 17.00, category: 'sides' },
